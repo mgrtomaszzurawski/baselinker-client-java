@@ -1,0 +1,22 @@
+{
+  "status": "SUCCESS",
+  "products": {
+    "12345": {
+      "is_bundle": false,
+      "parent_id": 0,
+      "sku": "PROD-001",
+      "ean": "5901234567890",
+      "tax_rate": 23,
+      "weight": 0.5,
+      "category_id": 10,
+      "prices": {"1": 29.99},
+      "stock": {"205": 100},
+      "text_fields": {
+        "name|pl": "Test Product PL",
+        "name|en": "Test Product"
+      },
+      "images": {"1": "https://example.com/img.jpg"},
+      "variants": {}
+    }
+  }
+}

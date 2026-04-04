@@ -1,0 +1,18 @@
+{
+  "status": "SUCCESS",
+  "inventories": [
+    {
+      "inventory_id": 307,
+      "name": "Main Catalog",
+      "description": "Primary product catalog",
+      "languages": ["pl", "en"],
+      "default_language": "pl",
+      "price_groups": [1, 2],
+      "default_price_group": 1,
+      "warehouses": [205],
+      "default_warehouse": "205",
+      "reservations": true,
+      "is_default": true
+    }
+  ]
+}

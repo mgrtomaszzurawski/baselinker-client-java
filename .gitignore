@@ -38,3 +38,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Review artifacts ###
+.reviews/
+
+### context ###
+context/
+docs/
+claude.md
+.claude/

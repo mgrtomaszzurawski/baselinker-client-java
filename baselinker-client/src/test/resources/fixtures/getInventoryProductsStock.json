@@ -1,0 +1,10 @@
+{
+  "status": "SUCCESS",
+  "products": {
+    "12345": {
+      "product_id": 12345,
+      "stock": {"205": 100, "206": 50},
+      "reservations": {"205": 5}
+    }
+  }
+}

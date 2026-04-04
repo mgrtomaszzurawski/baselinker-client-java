@@ -1,0 +1,12 @@
+{
+  "status": "SUCCESS",
+  "document_series": [
+    {
+      "document_series_id": 3,
+      "name": "GRN",
+      "document_type": 1,
+      "warehouse_id": 205,
+      "format": "%N/%M/%Y/GR"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "status": "ERROR",
+  "error_code": "ERROR_EMPTY_TOKEN",
+  "error_message": "Token is missing or invalid"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "SUCCESS",
+  "statuses": [
+    {
+      "id": 1051,
+      "name": "New orders",
+      "name_for_customer": "Order accepted",
+      "color": "#d1e5fc"
+    },
+    {
+      "id": 1052,
+      "name": "Shipped",
+      "name_for_customer": "Shipped",
+      "color": "#a3f5a3"
+    }
+  ]
+}
