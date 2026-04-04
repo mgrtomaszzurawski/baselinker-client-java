@@ -28,17 +28,32 @@ public class BaselinkerClient {
 
     private final String apiToken;
     private final URI apiUrl;
-    private final HttpClient httpClient;
+    private final HttpTransport transport;
     private final ObjectMapper objectMapper;
+
+    @FunctionalInterface
+    interface HttpTransport {
+        String send(HttpRequest request) throws IOException, InterruptedException;
+    }
 
     public BaselinkerClient(String apiToken) {
         this(apiToken, URI.create(DEFAULT_API_URL), HttpClient.newHttpClient(), defaultObjectMapper());
     }
 
     public BaselinkerClient(String apiToken, URI apiUrl, HttpClient httpClient, ObjectMapper objectMapper) {
+        this(
+                apiToken,
+                apiUrl,
+                request -> httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body(),
+                objectMapper
+        );
+        Objects.requireNonNull(httpClient, "httpClient must not be null");
+    }
+
+    BaselinkerClient(String apiToken, URI apiUrl, HttpTransport transport, ObjectMapper objectMapper) {
         this.apiToken = Objects.requireNonNull(apiToken, "apiToken must not be null");
         this.apiUrl = Objects.requireNonNull(apiUrl, "apiUrl must not be null");
-        this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
+        this.transport = Objects.requireNonNull(transport, "transport must not be null");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
     }
 
@@ -60,8 +75,8 @@ public class BaselinkerClient {
                     .POST(HttpRequest.BodyPublishers.ofString(formBody))
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return parseResponse(response.body(), responseType);
+            String responseBody = transport.send(request);
+            return parseResponse(responseBody, responseType);
         } catch (BaselinkerException exception) {
             throw exception;
         } catch (IOException exception) {
