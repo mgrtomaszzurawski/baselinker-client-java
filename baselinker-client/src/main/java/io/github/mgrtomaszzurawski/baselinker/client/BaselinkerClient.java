@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -24,10 +25,10 @@ public class BaselinkerClient {
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    private static final String STATUS_ERROR = "ERROR";
-    private static final String HEADER_TOKEN = "X-BLToken";
-    private static final String HEADER_CONTENT_TYPE = "Content-Type";
-    private static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
+    static final String STATUS_ERROR = "ERROR";
+    static final String HEADER_TOKEN = "X-BLToken";
+    static final String HEADER_CONTENT_TYPE = "Content-Type";
+    static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
     private static final String PARAM_METHOD = "method";
     private static final String PARAM_PARAMETERS = "parameters";
     private static final String METHOD_GET_STATUS = "getStatus";
@@ -141,8 +142,10 @@ public class BaselinkerClient {
             }
         } catch (BaselinkerApiException exception) {
             throw exception;
-        } catch (ReflectiveOperationException exception) {
+        } catch (NoSuchMethodException exception) {
             // Model lacks getStatus() — skip error check, return as-is
+        } catch (InvocationTargetException | IllegalAccessException exception) {
+            throw new RuntimeException("Failed to check API error status", exception);
         }
     }
 
@@ -151,8 +154,10 @@ public class BaselinkerClient {
             Method getter = target.getClass().getMethod(methodName);
             Object value = getter.invoke(target);
             return value != null ? value.toString() : null;
-        } catch (ReflectiveOperationException exception) {
+        } catch (NoSuchMethodException exception) {
             return null;
+        } catch (InvocationTargetException | IllegalAccessException exception) {
+            throw new RuntimeException("Failed to invoke " + methodName, exception);
         }
     }
 

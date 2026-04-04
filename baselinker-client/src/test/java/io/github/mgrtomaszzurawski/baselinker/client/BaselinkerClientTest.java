@@ -50,9 +50,10 @@ class BaselinkerClientTest {
         assertNotNull(request);
         assertEquals(TEST_URL, request.uri());
         assertEquals("POST", request.method());
-        assertEquals(TEST_TOKEN, request.headers().firstValue("X-BLToken").orElse(null));
-        assertEquals("application/x-www-form-urlencoded",
-                request.headers().firstValue("Content-Type").orElse(null));
+        assertEquals(TEST_TOKEN,
+                request.headers().firstValue(BaselinkerClient.HEADER_TOKEN).orElse(null));
+        assertEquals(BaselinkerClient.CONTENT_TYPE_FORM,
+                request.headers().firstValue(BaselinkerClient.HEADER_CONTENT_TYPE).orElse(null));
     }
 
     @Test

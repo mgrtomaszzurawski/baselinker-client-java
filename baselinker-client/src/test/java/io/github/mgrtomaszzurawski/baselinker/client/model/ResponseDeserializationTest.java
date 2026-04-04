@@ -58,7 +58,7 @@ class ResponseDeserializationTest {
         try {
             Object status = method.invoke(response);
             assertNotNull(status, "status must not be null");
-            assertEquals("SUCCESS", status.toString());
+            assertEquals(ApiResponseBase.StatusEnum.SUCCESS.getValue(), status.toString());
         } catch (ReflectiveOperationException exception) {
             throw new AssertionError("Failed to call getStatus()", exception);
         }
