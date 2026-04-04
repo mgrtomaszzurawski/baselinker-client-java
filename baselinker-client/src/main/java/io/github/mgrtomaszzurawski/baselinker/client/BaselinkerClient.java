@@ -2,10 +2,10 @@ package io.github.mgrtomaszzurawski.baselinker.client;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -19,16 +19,20 @@ import java.util.Objects;
 public class BaselinkerClient {
 
     private static final String DEFAULT_API_URL = "https://api.baselinker.com/connector.php";
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(30);
+    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     private static final String STATUS_ERROR = "ERROR";
     private static final String HEADER_TOKEN = "X-BLToken";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
     private static final String PARAM_METHOD = "method";
     private static final String PARAM_PARAMETERS = "parameters";
-    private static final String FIELD_STATUS = "status";
-    private static final String FIELD_ERROR_CODE = "error_code";
-    private static final String FIELD_ERROR_MESSAGE = "error_message";
+    private static final String METHOD_GET_STATUS = "getStatus";
+    private static final String METHOD_GET_ERROR_CODE = "getErrorCode";
+    private static final String METHOD_GET_ERROR_MESSAGE = "getErrorMessage";
 
     private final String apiToken;
     private final URI apiUrl;
@@ -42,7 +46,7 @@ public class BaselinkerClient {
     }
 
     public BaselinkerClient(String apiToken) {
-        this(apiToken, URI.create(DEFAULT_API_URL), HttpClient.newHttpClient(), defaultObjectMapper());
+        this(apiToken, URI.create(DEFAULT_API_URL), defaultHttpClient(), DEFAULT_OBJECT_MAPPER);
     }
 
     public BaselinkerClient(String apiToken, URI apiUrl, HttpClient httpClient, ObjectMapper objectMapper) {
@@ -116,18 +120,39 @@ public class BaselinkerClient {
 
     private <T> T parseResponse(String body, Class<T> responseType) throws BaselinkerException {
         try {
-            JsonNode root = objectMapper.readTree(body);
-            JsonNode statusNode = root.get(FIELD_STATUS);
-            if (statusNode != null && STATUS_ERROR.equals(statusNode.asText())) {
-                String errorCode = root.has(FIELD_ERROR_CODE) ? root.get(FIELD_ERROR_CODE).asText() : null;
-                String errorMessage = root.has(FIELD_ERROR_MESSAGE) ? root.get(FIELD_ERROR_MESSAGE).asText() : null;
-                throw new BaselinkerApiException(errorCode, errorMessage);
-            }
-            return objectMapper.treeToValue(root, responseType);
+            T response = objectMapper.readValue(body, responseType);
+            checkForApiError(response);
+            return response;
         } catch (BaselinkerApiException exception) {
             throw exception;
         } catch (JacksonException exception) {
             throw new BaselinkerException("Failed to parse API response", exception);
+        }
+    }
+
+    private <T> void checkForApiError(T response) throws BaselinkerApiException {
+        try {
+            Method getStatus = response.getClass().getMethod(METHOD_GET_STATUS);
+            Object status = getStatus.invoke(response);
+            if (status != null && STATUS_ERROR.equals(status.toString())) {
+                String errorCode = invokeStringGetter(response, METHOD_GET_ERROR_CODE);
+                String errorMessage = invokeStringGetter(response, METHOD_GET_ERROR_MESSAGE);
+                throw new BaselinkerApiException(errorCode, errorMessage);
+            }
+        } catch (BaselinkerApiException exception) {
+            throw exception;
+        } catch (ReflectiveOperationException exception) {
+            // Model lacks getStatus() — skip error check, return as-is
+        }
+    }
+
+    private static String invokeStringGetter(Object target, String methodName) {
+        try {
+            Method getter = target.getClass().getMethod(methodName);
+            Object value = getter.invoke(target);
+            return value != null ? value.toString() : null;
+        } catch (ReflectiveOperationException exception) {
+            return null;
         }
     }
 
@@ -143,8 +168,9 @@ public class BaselinkerClient {
         return value;
     }
 
-    private static ObjectMapper defaultObjectMapper() {
-        return new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static HttpClient defaultHttpClient() {
+        return HttpClient.newBuilder()
+                .connectTimeout(DEFAULT_CONNECT_TIMEOUT)
+                .build();
     }
 }
