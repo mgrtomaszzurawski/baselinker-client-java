@@ -12,7 +12,7 @@
       "prices": {"1": 29.99},
       "stock": {"205": 100},
       "text_fields": {
-        "name|pl": "Produkt testowy",
+        "name|pl": "Test Product PL",
         "name|en": "Test Product"
       },
       "images": {"1": "https://example.com/img.jpg"},
