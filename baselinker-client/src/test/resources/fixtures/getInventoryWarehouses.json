@@ -1,0 +1,21 @@
+{
+  "status": "SUCCESS",
+  "warehouses": [
+    {
+      "warehouse_type": "bl",
+      "warehouse_id": 205,
+      "name": "Default",
+      "description": "Default warehouse",
+      "stock_edition": true,
+      "is_default": true
+    },
+    {
+      "warehouse_type": "shop",
+      "warehouse_id": 2334,
+      "name": "MyShop.com",
+      "description": "Online store warehouse",
+      "stock_edition": false,
+      "is_default": false
+    }
+  ]
+}

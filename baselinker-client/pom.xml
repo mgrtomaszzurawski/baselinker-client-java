@@ -61,6 +61,12 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -82,15 +88,16 @@
                             <apiPackage>io.github.mgrtomaszzurawski.baselinker.client.api</apiPackage>
                             <modelPackage>io.github.mgrtomaszzurawski.baselinker.client.model</modelPackage>
                             <invokerPackage>io.github.mgrtomaszzurawski.baselinker.client</invokerPackage>
-                            <generateApis>false</generateApis>
-                            <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <library>native</library>
                                 <dateLibrary>java8</dateLibrary>
                                 <serializationLibrary>jackson</serializationLibrary>
                                 <useJakartaEe>true</useJakartaEe>
                             </configOptions>
+                            <generateApis>false</generateApis>
+                            <generateSupportingFiles>false</generateSupportingFiles>
                             <globalProperties>
+                                <models/>
                                 <modelDocs>false</modelDocs>
                                 <apiDocs>false</apiDocs>
                                 <modelTests>false</modelTests>

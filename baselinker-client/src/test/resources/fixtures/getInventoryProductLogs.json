@@ -1,0 +1,17 @@
+{
+  "status": "SUCCESS",
+  "logs": [
+    {
+      "profile": "admin",
+      "date": 1700000000,
+      "entries": [
+        {
+          "type": 1,
+          "from": "50",
+          "to": "100",
+          "info": "Stock update"
+        }
+      ]
+    }
+  ]
+}

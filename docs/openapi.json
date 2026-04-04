@@ -788,10 +788,8 @@
             "type": "object",
             "properties": {
               "integrations": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -807,10 +805,8 @@
             "type": "object",
             "properties": {
               "text_field_keys": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -854,10 +850,8 @@
             "type": "object",
             "properties": {
               "products": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -873,10 +867,8 @@
             "type": "object",
             "properties": {
               "products": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -892,10 +884,8 @@
             "type": "object",
             "properties": {
               "products": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -914,10 +904,8 @@
                 "type": "integer"
               },
               "warnings": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -933,10 +921,8 @@
             "type": "object",
             "properties": {
               "products": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -955,10 +941,8 @@
                 "type": "integer"
               },
               "warnings": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -1425,10 +1409,8 @@
                 "type": "integer"
               },
               "warnings": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }
@@ -1460,10 +1442,8 @@
             "type": "object",
             "properties": {
               "sources": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
+                "type": "object",
+                "additionalProperties": true
               }
             }
           }

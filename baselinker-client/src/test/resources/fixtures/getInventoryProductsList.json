@@ -1,0 +1,14 @@
+{
+  "status": "SUCCESS",
+  "products": {
+    "12345": {
+      "id": 12345,
+      "parent_id": 0,
+      "ean": "5901234567890",
+      "sku": "PROD-001",
+      "name": "Test Product",
+      "prices": {"1": 29.99},
+      "stock": {"205": 100}
+    }
+  }
+}
