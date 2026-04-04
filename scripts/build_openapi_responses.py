@@ -75,18 +75,13 @@ def main():
                 continue
             extra[name] = type_to_jsonschema(typ)
         schema_name = method_to_schema_name(method)
+        allof_parts = [{"$ref": "#/components/schemas/ApiResponseBase"}]
         if extra:
-            schemas[schema_name] = {
-                "allOf": [
-                    {"$ref": "#/components/schemas/ApiResponseBase"},
-                    {"type": "object", "properties": extra},
-                ],
-                "description": f"Response of method {method}",
-            }
-        else:
-            schemas[schema_name] = {
-                "$ref": "#/components/schemas/ApiResponseBase",
-            }
+            allof_parts.append({"type": "object", "properties": extra})
+        schemas[schema_name] = {
+            "allOf": allof_parts,
+            "description": f"Response of method {method}",
+        }
 
     OPENAPI_PATH.write_text(json.dumps(openapi, indent=2, ensure_ascii=False), encoding="utf-8")
     print("Updated", OPENAPI_PATH, "with", len(list(METHODS_DIR.glob("*.md"))), "response schemas.")

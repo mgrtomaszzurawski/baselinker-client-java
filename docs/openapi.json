@@ -562,7 +562,12 @@
         "description": "Response of method addInventoryPriceGroup"
       },
       "DeleteInventoryPriceGroupResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventoryPriceGroup"
       },
       "GetInventoryPriceGroupsResponse": {
         "allOf": [
@@ -600,7 +605,12 @@
         "description": "Response of method addInventoryWarehouse"
       },
       "DeleteInventoryWarehouseResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventoryWarehouse"
       },
       "GetInventoryWarehousesResponse": {
         "allOf": [
@@ -638,7 +648,12 @@
         "description": "Response of method addInventory"
       },
       "DeleteInventoryResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventory"
       },
       "AddInventoryCategoryResponse": {
         "allOf": [
@@ -657,7 +672,12 @@
         "description": "Response of method addInventoryCategory"
       },
       "DeleteInventoryCategoryResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventoryCategory"
       },
       "GetInventoryCategoriesResponse": {
         "allOf": [
@@ -714,7 +734,12 @@
         "description": "Response of method addInventoryManufacturer"
       },
       "DeleteInventoryManufacturerResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventoryManufacturer"
       },
       "GetInventoryManufacturersResponse": {
         "allOf": [
@@ -813,7 +838,12 @@
         "description": "Response of method addInventoryProduct"
       },
       "DeleteInventoryProductResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventoryProduct"
       },
       "GetInventoryProductsDataResponse": {
         "allOf": [
@@ -955,7 +985,12 @@
         "description": "Response of method getInventoryProductLogs"
       },
       "RunProductMacroTriggerResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method runProductMacroTrigger"
       },
       "AddInventoryDocumentResponse": {
         "allOf": [
@@ -977,7 +1012,12 @@
         "description": "Response of method addInventoryDocument"
       },
       "SetInventoryDocumentStatusConfirmedResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setInventoryDocumentStatusConfirmed"
       },
       "GetInventoryDocumentsResponse": {
         "allOf": [
@@ -1151,7 +1191,12 @@
         "description": "Response of method addInventoryPurchaseOrderItems"
       },
       "SetInventoryPurchaseOrderStatusResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setInventoryPurchaseOrderStatus"
       },
       "GetInventorySuppliersResponse": {
         "allOf": [
@@ -1189,7 +1234,12 @@
         "description": "Response of method addInventorySupplier"
       },
       "DeleteInventorySupplierResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventorySupplier"
       },
       "GetInventoryPayersResponse": {
         "allOf": [
@@ -1227,7 +1277,12 @@
         "description": "Response of method addInventoryPayer"
       },
       "DeleteInventoryPayerResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteInventoryPayer"
       },
       "GetExternalStoragesListResponse": {
         "allOf": [
@@ -1684,7 +1739,12 @@
         "description": "Response of method getReceipt"
       },
       "SetOrderFieldsResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderFields"
       },
       "AddOrderProductResponse": {
         "allOf": [
@@ -1703,28 +1763,68 @@
         "description": "Response of method addOrderProduct"
       },
       "SetOrderProductFieldsResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderProductFields"
       },
       "DeleteOrderProductResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteOrderProduct"
       },
       "SetOrderPaymentResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderPayment"
       },
       "SetOrderStatusResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderStatus"
       },
       "SetOrderStatusesResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderStatuses"
       },
       "SetOrderReceiptResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderReceipt"
       },
       "AddOrderInvoiceFileResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method addOrderInvoiceFile"
       },
       "AddOrderReceiptFileResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method addOrderReceiptFile"
       },
       "AddOrderBySplitResponse": {
         "allOf": [
@@ -1778,7 +1878,12 @@
         "description": "Response of method getInvoiceFile"
       },
       "RunOrderMacroTriggerResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method runOrderMacroTrigger"
       },
       "GetPickPackCartsResponse": {
         "allOf": [
@@ -1911,7 +2016,12 @@
         "description": "Response of method getOrderReturnPaymentsHistory"
       },
       "SetOrderReturnFieldsResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderReturnFields"
       },
       "AddOrderReturnProductResponse": {
         "allOf": [
@@ -1930,13 +2040,28 @@
         "description": "Response of method addOrderReturnProduct"
       },
       "SetOrderReturnProductFieldsResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderReturnProductFields"
       },
       "DeleteOrderReturnProductResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteOrderReturnProduct"
       },
       "SetOrderReturnRefundResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderReturnRefund"
       },
       "GetOrderReturnReasonsListResponse": {
         "allOf": [
@@ -1958,13 +2083,28 @@
         "description": "Response of method getOrderReturnReasonsList"
       },
       "SetOrderReturnStatusResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderReturnStatus"
       },
       "SetOrderReturnStatusesResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method setOrderReturnStatuses"
       },
       "RunOrderReturnMacroTriggerResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method runOrderReturnMacroTrigger"
       },
       "GetOrderReturnProductStatusesResponse": {
         "allOf": [
@@ -2033,7 +2173,12 @@
         "description": "Response of method getCourierFields"
       },
       "GetCourierServicesResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method getCourierServices"
       },
       "GetCourierAccountsResponse": {
         "allOf": [
@@ -2150,7 +2295,12 @@
         "description": "Response of method getCourierPackagesStatusHistory"
       },
       "DeleteCourierPackageResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteCourierPackage"
       },
       "RunRequestParcelPickupResponse": {
         "allOf": [
@@ -2258,13 +2408,28 @@
         "description": "Response of method addProductVariant"
       },
       "DeleteCategoryResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteCategory"
       },
       "DeleteProductResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteProduct"
       },
       "DeleteProductVariantResponse": {
-        "$ref": "#/components/schemas/ApiResponseBase"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          }
+        ],
+        "description": "Response of method deleteProductVariant"
       },
       "GetCategoriesResponse": {
         "allOf": [
