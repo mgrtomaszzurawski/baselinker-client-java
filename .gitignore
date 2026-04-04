@@ -41,3 +41,9 @@ build/
 
 ### Review artifacts ###
 .reviews/
+
+### context ###
+context/
+docs/
+claude.md
+.claude/
