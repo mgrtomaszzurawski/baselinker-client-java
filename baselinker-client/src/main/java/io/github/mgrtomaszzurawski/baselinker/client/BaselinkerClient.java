@@ -24,6 +24,9 @@ public class BaselinkerClient {
     private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(30);
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final HttpClient DEFAULT_HTTP_CLIENT = HttpClient.newBuilder()
+            .connectTimeout(DEFAULT_CONNECT_TIMEOUT)
+            .build();
 
     static final String STATUS_ERROR = "ERROR";
     static final String HEADER_TOKEN = "X-BLToken";
@@ -47,7 +50,7 @@ public class BaselinkerClient {
     }
 
     public BaselinkerClient(String apiToken) {
-        this(apiToken, URI.create(DEFAULT_API_URL), defaultHttpClient(), DEFAULT_OBJECT_MAPPER);
+        this(apiToken, URI.create(DEFAULT_API_URL), DEFAULT_HTTP_CLIENT, DEFAULT_OBJECT_MAPPER);
     }
 
     public BaselinkerClient(String apiToken, URI apiUrl, HttpClient httpClient, ObjectMapper objectMapper) {
@@ -145,7 +148,8 @@ public class BaselinkerClient {
         } catch (NoSuchMethodException exception) {
             // Model lacks getStatus() — skip error check, return as-is
         } catch (InvocationTargetException | IllegalAccessException exception) {
-            throw new RuntimeException("Failed to check API error status", exception);
+            // should never happen with generated models — fail fast
+            throw new IllegalStateException("Failed to check API error status", exception);
         }
     }
 
@@ -157,7 +161,7 @@ public class BaselinkerClient {
         } catch (NoSuchMethodException exception) {
             return null;
         } catch (InvocationTargetException | IllegalAccessException exception) {
-            throw new RuntimeException("Failed to invoke " + methodName, exception);
+            return null;
         }
     }
 
@@ -173,9 +177,4 @@ public class BaselinkerClient {
         return value;
     }
 
-    private static HttpClient defaultHttpClient() {
-        return HttpClient.newBuilder()
-                .connectTimeout(DEFAULT_CONNECT_TIMEOUT)
-                .build();
-    }
 }

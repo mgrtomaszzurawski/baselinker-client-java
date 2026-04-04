@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.time.Duration;
 import java.net.URLDecoder;
 import java.net.http.HttpRequest;
 import java.nio.ByteBuffer;
@@ -133,6 +134,7 @@ class BaselinkerClientTest {
         client.execute("addOrder", Map.of(), AddOrderResponse.class);
 
         assertTrue(captured.get().timeout().isPresent(), "Request should have a timeout");
+        assertEquals(Duration.ofSeconds(30), captured.get().timeout().get());
     }
 
     @Test

@@ -7,12 +7,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ResponseDeserializationTest {
@@ -62,6 +67,52 @@ class ResponseDeserializationTest {
         } catch (ReflectiveOperationException exception) {
             throw new AssertionError("Failed to call getStatus()", exception);
         }
+    }
+
+    @Test
+    void shouldDeserializeAddOrderFields() throws IOException {
+        String json = loadFixture("addOrder.json");
+        AddOrderResponse response = objectMapper.readValue(json, AddOrderResponse.class);
+        assertEquals(16331079, response.getOrderId());
+    }
+
+    @Test
+    void shouldDeserializeGetOrdersFields() throws IOException {
+        String json = loadFixture("getOrders.json");
+        GetOrdersResponse response = objectMapper.readValue(json, GetOrdersResponse.class);
+        assertNotNull(response.getOrders());
+        assertFalse(response.getOrders().isEmpty());
+    }
+
+    @Test
+    void shouldDeserializeGetOrderStatusListFields() throws IOException {
+        String json = loadFixture("getOrderStatusList.json");
+        GetOrderStatusListResponse response = objectMapper.readValue(json, GetOrderStatusListResponse.class);
+        assertNotNull(response.getStatuses());
+        assertEquals(2, response.getStatuses().size());
+    }
+
+    @Test
+    void shouldDeserializeAddInventoryDocumentFields() throws IOException {
+        String json = loadFixture("addInventoryDocument.json");
+        AddInventoryDocumentResponse response = objectMapper.readValue(json, AddInventoryDocumentResponse.class);
+        assertEquals(101, response.getDocumentId());
+        assertEquals("GR/2021/1", response.getDocumentNumber());
+    }
+
+    @Test
+    void shouldDeserializeUpdateInventoryProductsStockFields() throws IOException {
+        String json = loadFixture("updateInventoryProductsStock.json");
+        UpdateInventoryProductsStockResponse response = objectMapper.readValue(json, UpdateInventoryProductsStockResponse.class);
+        assertEquals(2, response.getCounter());
+    }
+
+    @Test
+    void shouldDeserializeGetInventoryWarehousesFields() throws IOException {
+        String json = loadFixture("getInventoryWarehouses.json");
+        GetInventoryWarehousesResponse response = objectMapper.readValue(json, GetInventoryWarehousesResponse.class);
+        assertNotNull(response.getWarehouses());
+        assertEquals(2, response.getWarehouses().size());
     }
 
     private static String loadFixture(String filename) throws IOException {
