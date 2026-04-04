@@ -113,6 +113,28 @@ class BaselinkerClientTest {
     }
 
     @Test
+    void shouldRejectBlankToken() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new BaselinkerClient("   "));
+    }
+
+    @Test
+    void shouldRejectEmptyToken() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new BaselinkerClient(""));
+    }
+
+    @Test
+    void shouldSetRequestTimeout() throws Exception {
+        AtomicReference<HttpRequest> captured = new AtomicReference<>();
+        BaselinkerClient client = clientWithCapture(captured, loadFixture("addOrder.json"));
+
+        client.execute("addOrder", Map.of(), AddOrderResponse.class);
+
+        assertTrue(captured.get().timeout().isPresent(), "Request should have a timeout");
+    }
+
+    @Test
     void shouldRejectNullMethod() {
         BaselinkerClient client = clientWithResponse("{}");
 

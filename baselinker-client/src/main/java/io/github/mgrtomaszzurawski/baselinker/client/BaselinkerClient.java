@@ -1,5 +1,6 @@
 package io.github.mgrtomaszzurawski.baselinker.client;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,14 +12,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 
 public class BaselinkerClient {
 
     private static final String DEFAULT_API_URL = "https://api.baselinker.com/connector.php";
+    private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(30);
     private static final String STATUS_ERROR = "ERROR";
     private static final String HEADER_TOKEN = "X-BLToken";
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
     private static final String PARAM_METHOD = "method";
     private static final String PARAM_PARAMETERS = "parameters";
@@ -28,6 +32,7 @@ public class BaselinkerClient {
 
     private final String apiToken;
     private final URI apiUrl;
+    private final Duration requestTimeout;
     private final HttpTransport transport;
     private final ObjectMapper objectMapper;
 
@@ -44,17 +49,34 @@ public class BaselinkerClient {
         this(
                 apiToken,
                 apiUrl,
-                request -> httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body(),
-                objectMapper
+                Objects.requireNonNull(httpClient, "httpClient must not be null"),
+                objectMapper,
+                DEFAULT_REQUEST_TIMEOUT
         );
-        Objects.requireNonNull(httpClient, "httpClient must not be null");
+    }
+
+    private BaselinkerClient(String apiToken, URI apiUrl, HttpClient httpClient,
+                             ObjectMapper objectMapper, Duration requestTimeout) {
+        this(
+                apiToken,
+                apiUrl,
+                request -> httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body(),
+                objectMapper,
+                requestTimeout
+        );
     }
 
     BaselinkerClient(String apiToken, URI apiUrl, HttpTransport transport, ObjectMapper objectMapper) {
-        this.apiToken = Objects.requireNonNull(apiToken, "apiToken must not be null");
+        this(apiToken, apiUrl, transport, objectMapper, DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    BaselinkerClient(String apiToken, URI apiUrl, HttpTransport transport,
+                     ObjectMapper objectMapper, Duration requestTimeout) {
+        this.apiToken = requireNonBlank(apiToken, "apiToken must not be null or blank");
         this.apiUrl = Objects.requireNonNull(apiUrl, "apiUrl must not be null");
         this.transport = Objects.requireNonNull(transport, "transport must not be null");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
+        this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout must not be null");
     }
 
     public <T> T execute(String method, Map<String, Object> parameters, Class<T> responseType)
@@ -70,8 +92,9 @@ public class BaselinkerClient {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(apiUrl)
+                    .timeout(requestTimeout)
                     .header(HEADER_TOKEN, apiToken)
-                    .header("Content-Type", CONTENT_TYPE_FORM)
+                    .header(HEADER_CONTENT_TYPE, CONTENT_TYPE_FORM)
                     .POST(HttpRequest.BodyPublishers.ofString(formBody))
                     .build();
 
@@ -103,13 +126,21 @@ public class BaselinkerClient {
             return objectMapper.treeToValue(root, responseType);
         } catch (BaselinkerApiException exception) {
             throw exception;
-        } catch (Exception exception) {
+        } catch (JacksonException exception) {
             throw new BaselinkerException("Failed to parse API response", exception);
         }
     }
 
     private static String urlEncode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private static String requireNonBlank(String value, String message) {
+        Objects.requireNonNull(value, message);
+        if (value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
+        return value;
     }
 
     private static ObjectMapper defaultObjectMapper() {
