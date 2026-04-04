@@ -1,0 +1,2537 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "BaseLinker API",
+    "description": "API umożliwia wymianę informacji między zewnętrznym systemem a BaseLinker. Komunikacja w formacie JSON. Do każdego żądania wymagany jest token (nagłówek X-BLToken). Limit: 100 żądań na minutę. Kodowanie UTF-8. Dokumentacja metod: katalog docs/methods/.",
+    "version": "1.0.0",
+    "contact": {
+      "url": "https://api.baselinker.com/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.baselinker.com",
+      "description": "BaseLinker API server"
+    }
+  ],
+  "security": [
+    {
+      "blToken": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Product catalog",
+      "description": "Katalog produktów"
+    },
+    {
+      "name": "Inventory documents",
+      "description": "Dokumenty magazynowe"
+    },
+    {
+      "name": "Inventory purchase orders",
+      "description": "Zamówienia zakupu"
+    },
+    {
+      "name": "Inventory suppliers",
+      "description": "Dostawcy"
+    },
+    {
+      "name": "Inventory payers",
+      "description": "Płatnicy"
+    },
+    {
+      "name": "External storages",
+      "description": "Magazyny zewnętrzne"
+    },
+    {
+      "name": "Orders",
+      "description": "Zamówienia"
+    },
+    {
+      "name": "Order returns",
+      "description": "Zwroty"
+    },
+    {
+      "name": "Courier shipments",
+      "description": "Kurierzy"
+    },
+    {
+      "name": "Products storage",
+      "description": "Products storage [OBSOLETE]"
+    },
+    {
+      "name": "Printouts",
+      "description": "Druki"
+    },
+    {
+      "name": "Base Connect",
+      "description": "Base Connect"
+    }
+  ],
+  "paths": {
+    "/connector.php": {
+      "post": {
+        "summary": "Invoke BaseLinker API method",
+        "description": "Wywołanie dowolnej metody API. Przekaż pole `method` (nazwa metody) oraz `parameters` (obiekt JSON z argumentami). W praktyce żądanie wysyłane jest jako application/x-www-form-urlencoded: method=nazwa_metody&parameters=URL_ENCODED_JSON. Szczegóły parametrów i odpowiedzi dla każdej metody: docs/methods/<method>.md.\n\n**Modele odpowiedzi:** W components/schemas są zdefiniowane typowane schematy *Response (np. GetOrdersResponse, AddOrderResponse) – generator OpenAPI utworzy z nich osobne klasy. Endpoint zwraca generyczny ConnectorResponse; w swoim kliencie po wywołaniu możesz zdeserializować JSON do właściwego typu (np. ObjectMapper.readValue(json, GetOrdersResponse.class)) na podstawie wysłanej metody.",
+        "operationId": "connector",
+        "security": [
+          {
+            "blToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorRequestForm"
+              },
+              "example": {
+                "method": "getOrders",
+                "parameters": "{\"date_confirmed_from\": 1407341754, \"get_unconfirmed_orders\": false}"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorRequest"
+              },
+              "example": {
+                "method": "getOrders",
+                "parameters": {
+                  "date_confirmed_from": 1407341754,
+                  "get_unconfirmed_orders": false
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Odpowiedź API. Zawsze JSON z polem `status`: SUCCESS lub ERROR. Przy ERROR zwracane są także `error_message` i `error_code`. Pozostałe pola zależą od metody.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "blToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-BLToken",
+        "description": "Token API z panelu BaseLinker: Konto i inne → Moje konto → API"
+      }
+    },
+    "schemas": {
+      "MethodName": {
+        "type": "string",
+        "enum": [
+          "addInventoryPriceGroup",
+          "deleteInventoryPriceGroup",
+          "getInventoryPriceGroups",
+          "addInventoryWarehouse",
+          "deleteInventoryWarehouse",
+          "getInventoryWarehouses",
+          "addInventory",
+          "deleteInventory",
+          "getInventories",
+          "addInventoryCategory",
+          "deleteInventoryCategory",
+          "getInventoryCategories",
+          "getInventoryTags",
+          "addInventoryManufacturer",
+          "deleteInventoryManufacturer",
+          "getInventoryManufacturers",
+          "getInventoryExtraFields",
+          "getInventoryIntegrations",
+          "getInventoryAvailableTextFieldKeys",
+          "addInventoryProduct",
+          "deleteInventoryProduct",
+          "getInventoryProductsData",
+          "getInventoryProductsList",
+          "getInventoryProductsStock",
+          "updateInventoryProductsStock",
+          "getInventoryProductsPrices",
+          "updateInventoryProductsPrices",
+          "getInventoryProductLogs",
+          "runProductMacroTrigger",
+          "addInventoryDocument",
+          "setInventoryDocumentStatusConfirmed",
+          "getInventoryDocuments",
+          "getInventoryDocumentItems",
+          "addInventoryDocumentItems",
+          "getInventoryDocumentSeries",
+          "getInventoryPurchaseOrders",
+          "getInventoryPurchaseOrderItems",
+          "getInventoryPurchaseOrderSeries",
+          "addInventoryPurchaseOrder",
+          "addInventoryPurchaseOrderItems",
+          "setInventoryPurchaseOrderStatus",
+          "getInventorySuppliers",
+          "addInventorySupplier",
+          "deleteInventorySupplier",
+          "getInventoryPayers",
+          "addInventoryPayer",
+          "deleteInventoryPayer",
+          "getExternalStoragesList",
+          "getExternalStorageCategories",
+          "getExternalStorageProductsData",
+          "getExternalStorageProductsList",
+          "getExternalStorageProductsQuantity",
+          "getExternalStorageProductsPrices",
+          "updateExternalStorageProductsQuantity",
+          "getJournalList",
+          "addOrder",
+          "addOrderDuplicate",
+          "getOrderSources",
+          "getOrderExtraFields",
+          "getOrders",
+          "getOrderTransactionData",
+          "getOrdersByEmail",
+          "getOrdersByPhone",
+          "deleteOrders",
+          "addInvoice",
+          "addInvoiceCorrection",
+          "getInvoices",
+          "getSeries",
+          "getOrderStatusList",
+          "getOrderPaymentsHistory",
+          "getOrderPickPackHistory",
+          "getNewReceipts",
+          "getReceipts",
+          "getReceipt",
+          "setOrderFields",
+          "addOrderProduct",
+          "setOrderProductFields",
+          "deleteOrderProduct",
+          "setOrderPayment",
+          "setOrderStatus",
+          "setOrderStatuses",
+          "setOrderReceipt",
+          "addOrderInvoiceFile",
+          "addOrderReceiptFile",
+          "addOrderBySplit",
+          "setOrdersMerge",
+          "getInvoiceFile",
+          "runOrderMacroTrigger",
+          "getPickPackCarts",
+          "getOrderReturnJournalList",
+          "addOrderReturn",
+          "getOrderReturnExtraFields",
+          "getOrderReturns",
+          "getOrderReturnStatusList",
+          "getOrderReturnPaymentsHistory",
+          "setOrderReturnFields",
+          "addOrderReturnProduct",
+          "setOrderReturnProductFields",
+          "deleteOrderReturnProduct",
+          "setOrderReturnRefund",
+          "getOrderReturnReasonsList",
+          "setOrderReturnStatus",
+          "setOrderReturnStatuses",
+          "runOrderReturnMacroTrigger",
+          "getOrderReturnProductStatuses",
+          "createPackage",
+          "createPackageManual",
+          "getCouriersList",
+          "getCourierFields",
+          "getCourierServices",
+          "getCourierAccounts",
+          "getLabel",
+          "getProtocol",
+          "getCourierDocument",
+          "getOrderPackages",
+          "getPackageDetails",
+          "getCourierPackagesStatusHistory",
+          "deleteCourierPackage",
+          "runRequestParcelPickup",
+          "getRequestParcelPickupFields",
+          "getStoragesList",
+          "addCategory",
+          "addProduct",
+          "addProductVariant",
+          "deleteCategory",
+          "deleteProduct",
+          "deleteProductVariant",
+          "getCategories",
+          "getProductsData",
+          "getProductsList",
+          "getProductsQuantity",
+          "getProductsPrices",
+          "updateProductsQuantity",
+          "updateProductsPrices",
+          "getOrderPrintoutTemplates",
+          "getInventoryPrintoutTemplates",
+          "getConnectIntegrations",
+          "getConnectIntegrationContractors",
+          "getConnectContractorCreditHistory",
+          "setConnectContractorCreditLimit",
+          "addConnectContractorCreditSettlement"
+        ],
+        "description": "Nazwa metody API"
+      },
+      "ConnectorRequestForm": {
+        "type": "object",
+        "required": [
+          "method"
+        ],
+        "properties": {
+          "method": {
+            "$ref": "#/components/schemas/MethodName"
+          },
+          "parameters": {
+            "type": "string",
+            "description": "Argumenty metody w formacie JSON (dla application/x-www-form-urlencoded – przekaż jako string, np. JSON.stringify(obj))"
+          }
+        }
+      },
+      "ConnectorRequest": {
+        "type": "object",
+        "required": [
+          "method"
+        ],
+        "properties": {
+          "method": {
+            "$ref": "#/components/schemas/MethodName"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Argumenty metody. Pola zależą od wybranej metody – szczegóły w docs/methods/<method>.md"
+          }
+        }
+      },
+      "ConnectorResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUCCESS",
+              "ERROR"
+            ],
+            "description": "Wynik wywołania"
+          },
+          "error_message": {
+            "type": "string",
+            "description": "Opis błędu (gdy status=ERROR)"
+          },
+          "error_code": {
+            "type": "string",
+            "description": "Kod błędu (gdy status=ERROR)"
+          }
+        },
+        "additionalProperties": true,
+        "description": "Odpowiedź API (generyczna). Dla typowanych modeli użyj schematów *Response poniżej – generator wygeneruje osobne klasy (GetOrdersResponse, AddOrderResponse itd.); w kliencie można rzutować/deserializować odpowiedź do właściwego typu po wywołaniu."
+      },
+      "ApiResponseBase": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUCCESS",
+              "ERROR"
+            ],
+            "description": "Call result"
+          },
+          "error_message": {
+            "type": "string",
+            "description": "Error description (when status=ERROR)"
+          },
+          "error_code": {
+            "type": "string",
+            "description": "Error code (when status=ERROR)"
+          }
+        },
+        "description": "Base fields of every API response"
+      },
+      "GetOrdersResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrders"
+      },
+      "AddOrderResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addOrder"
+      },
+      "GetOrderStatusListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "statuses": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderStatusList"
+      },
+      "GetInventoriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "inventories": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventories"
+      },
+      "GetConnectIntegrationsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "integrations": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "description": "Response of method getConnectIntegrations"
+      },
+      "GetJournalListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getJournalList"
+      },
+      "AddInvoiceResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "invoice_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInvoice"
+      },
+      "GetCouriersListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "couriers": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getCouriersList"
+      },
+      "CreatePackageResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "package_id": {
+                "type": "integer"
+              },
+              "package_number": {
+                "type": "string"
+              },
+              "courier_inner_number": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method createPackage"
+      },
+      "GetLabelResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "extension": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method getLabel"
+      },
+      "AddInventoryPriceGroupResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "price_group_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryPriceGroup"
+      },
+      "DeleteInventoryPriceGroupResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryPriceGroupsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "price_groups": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryPriceGroups"
+      },
+      "AddInventoryWarehouseResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "warehouse_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryWarehouse"
+      },
+      "DeleteInventoryWarehouseResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryWarehousesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "warehouses": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryWarehouses"
+      },
+      "AddInventoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "inventory_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventory"
+      },
+      "DeleteInventoryResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddInventoryCategoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "category_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryCategory"
+      },
+      "DeleteInventoryCategoryResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryCategoriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryCategories"
+      },
+      "GetInventoryTagsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryTags"
+      },
+      "AddInventoryManufacturerResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "manufacturer_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryManufacturer"
+      },
+      "DeleteInventoryManufacturerResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryManufacturersResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "manufacturers": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryManufacturers"
+      },
+      "GetInventoryExtraFieldsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "extra_fields": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryExtraFields"
+      },
+      "GetInventoryIntegrationsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "integrations": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryIntegrations"
+      },
+      "GetInventoryAvailableTextFieldKeysResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "text_field_keys": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryAvailableTextFieldKeys"
+      },
+      "AddInventoryProductResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "product_id": {
+                "type": "string"
+              },
+              "warnings": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryProduct"
+      },
+      "DeleteInventoryProductResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryProductsDataResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryProductsData"
+      },
+      "GetInventoryProductsListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryProductsList"
+      },
+      "GetInventoryProductsStockResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryProductsStock"
+      },
+      "UpdateInventoryProductsStockResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "counter": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method updateInventoryProductsStock"
+      },
+      "GetInventoryProductsPricesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryProductsPrices"
+      },
+      "UpdateInventoryProductsPricesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "counter": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method updateInventoryProductsPrices"
+      },
+      "GetInventoryProductLogsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryProductLogs"
+      },
+      "RunProductMacroTriggerResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddInventoryDocumentResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "document_id": {
+                "type": "integer"
+              },
+              "document_number": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryDocument"
+      },
+      "SetInventoryDocumentStatusConfirmedResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryDocumentsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "documents": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryDocuments"
+      },
+      "GetInventoryDocumentItemsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryDocumentItems"
+      },
+      "AddInventoryDocumentItemsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryDocumentItems"
+      },
+      "GetInventoryDocumentSeriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "document_series": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryDocumentSeries"
+      },
+      "GetInventoryPurchaseOrdersResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "purchase_orders": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryPurchaseOrders"
+      },
+      "GetInventoryPurchaseOrderItemsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryPurchaseOrderItems"
+      },
+      "GetInventoryPurchaseOrderSeriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "series": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryPurchaseOrderSeries"
+      },
+      "AddInventoryPurchaseOrderResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "integer"
+              },
+              "document_number": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryPurchaseOrder"
+      },
+      "AddInventoryPurchaseOrderItemsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryPurchaseOrderItems"
+      },
+      "SetInventoryPurchaseOrderStatusResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventorySuppliersResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "suppliers": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventorySuppliers"
+      },
+      "AddInventorySupplierResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "supplier_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventorySupplier"
+      },
+      "DeleteInventorySupplierResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetInventoryPayersResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "payers": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryPayers"
+      },
+      "AddInventoryPayerResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "payer_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInventoryPayer"
+      },
+      "DeleteInventoryPayerResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetExternalStoragesListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getExternalStoragesList"
+      },
+      "GetExternalStorageCategoriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getExternalStorageCategories"
+      },
+      "GetExternalStorageProductsDataResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getExternalStorageProductsData"
+      },
+      "GetExternalStorageProductsListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getExternalStorageProductsList"
+      },
+      "GetExternalStorageProductsQuantityResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getExternalStorageProductsQuantity"
+      },
+      "GetExternalStorageProductsPricesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getExternalStorageProductsPrices"
+      },
+      "UpdateExternalStorageProductsQuantityResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "counter": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method updateExternalStorageProductsQuantity"
+      },
+      "AddOrderDuplicateResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "order_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addOrderDuplicate"
+      },
+      "GetOrderSourcesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderSources"
+      },
+      "GetOrderExtraFieldsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "extra_fields": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderExtraFields"
+      },
+      "GetOrderTransactionDataResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "currency": {
+                "type": "string"
+              },
+              "fulfillment_shipments": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "fulfillment_center_id": {
+                "type": "string"
+              },
+              "marketplace_transaction_id": {
+                "type": "string"
+              },
+              "account_id": {
+                "type": "integer"
+              },
+              "transaction_date": {
+                "type": "integer"
+              },
+              "order_items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderTransactionData"
+      },
+      "GetOrdersByEmailResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrdersByEmail"
+      },
+      "GetOrdersByPhoneResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrdersByPhone"
+      },
+      "DeleteOrdersResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "deleted_order_ids": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method deleteOrders"
+      },
+      "AddInvoiceCorrectionResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "invoice_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addInvoiceCorrection"
+      },
+      "GetInvoicesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "invoices": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInvoices"
+      },
+      "GetSeriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "series": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getSeries"
+      },
+      "GetOrderPaymentsHistoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "payments": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderPaymentsHistory"
+      },
+      "GetOrderPickPackHistoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "history": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderPickPackHistory"
+      },
+      "GetNewReceiptsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getNewReceipts"
+      },
+      "GetReceiptsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "receipts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getReceipts"
+      },
+      "GetReceiptResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "external_receipt_number": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getReceipt"
+      },
+      "SetOrderFieldsResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddOrderProductResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "order_product_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addOrderProduct"
+      },
+      "SetOrderProductFieldsResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "DeleteOrderProductResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "SetOrderPaymentResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "SetOrderStatusResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "SetOrderStatusesResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "SetOrderReceiptResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddOrderInvoiceFileResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddOrderReceiptFileResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddOrderBySplitResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "new_order_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addOrderBySplit"
+      },
+      "SetOrdersMergeResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "merged_order_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method setOrdersMerge"
+      },
+      "GetInvoiceFileResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "invoice": {
+                "type": "string"
+              },
+              "invoice_number": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInvoiceFile"
+      },
+      "RunOrderMacroTriggerResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetPickPackCartsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "carts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getPickPackCarts"
+      },
+      "GetOrderReturnJournalListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturnJournalList"
+      },
+      "AddOrderReturnResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "return_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addOrderReturn"
+      },
+      "GetOrderReturnExtraFieldsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "extra_fields": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturnExtraFields"
+      },
+      "GetOrderReturnsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "returns": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturns"
+      },
+      "GetOrderReturnStatusListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "statuses": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturnStatusList"
+      },
+      "GetOrderReturnPaymentsHistoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "payments": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturnPaymentsHistory"
+      },
+      "SetOrderReturnFieldsResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "AddOrderReturnProductResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "order_return_product_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addOrderReturnProduct"
+      },
+      "SetOrderReturnProductFieldsResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "DeleteOrderReturnProductResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "SetOrderReturnRefundResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetOrderReturnReasonsListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "return_reasons": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturnReasonsList"
+      },
+      "SetOrderReturnStatusResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "SetOrderReturnStatusesResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "RunOrderReturnMacroTriggerResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetOrderReturnProductStatusesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "order_return_product_statuses": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderReturnProductStatuses"
+      },
+      "CreatePackageManualResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "package_id": {
+                "type": "integer"
+              },
+              "package_number": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method createPackageManual"
+      },
+      "GetCourierFieldsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "multi_packages": {
+                "type": "boolean"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "package_fields": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getCourierFields"
+      },
+      "GetCourierServicesResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetCourierAccountsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "accounts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getCourierAccounts"
+      },
+      "GetProtocolResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "extension": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method getProtocol"
+      },
+      "GetCourierDocumentResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "extension": {
+                "type": "string"
+              },
+              "document": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method getCourierDocument"
+      },
+      "GetOrderPackagesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "packages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderPackages"
+      },
+      "GetPackageDetailsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "package_details": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getPackageDetails"
+      },
+      "GetCourierPackagesStatusHistoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "packages_history": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getCourierPackagesStatusHistory"
+      },
+      "DeleteCourierPackageResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "RunRequestParcelPickupResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "pickup_number": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method runRequestParcelPickup"
+      },
+      "GetRequestParcelPickupFieldsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getRequestParcelPickupFields"
+      },
+      "GetStoragesListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getStoragesList"
+      },
+      "AddCategoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "category_id": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addCategory"
+      },
+      "AddProductResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addProduct"
+      },
+      "AddProductVariantResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addProductVariant"
+      },
+      "DeleteCategoryResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "DeleteProductResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "DeleteProductVariantResponse": {
+        "$ref": "#/components/schemas/ApiResponseBase"
+      },
+      "GetCategoriesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getCategories"
+      },
+      "GetProductsDataResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getProductsData"
+      },
+      "GetProductsListResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getProductsList"
+      },
+      "GetProductsQuantityResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getProductsQuantity"
+      },
+      "GetProductsPricesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "storage_id": {
+                "type": "string"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getProductsPrices"
+      },
+      "UpdateProductsQuantityResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "counter": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method updateProductsQuantity"
+      },
+      "UpdateProductsPricesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "counter": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method updateProductsPrices"
+      },
+      "GetOrderPrintoutTemplatesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "printouts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getOrderPrintoutTemplates"
+      },
+      "GetInventoryPrintoutTemplatesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "printouts": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getInventoryPrintoutTemplates"
+      },
+      "GetConnectIntegrationContractorsResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "contractors": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        ],
+        "description": "Response of method getConnectIntegrationContractors"
+      },
+      "GetConnectContractorCreditHistoryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "credit_data": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Response of method getConnectContractorCreditHistory"
+      },
+      "SetConnectContractorCreditLimitResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "new_limit_set": {
+                "type": "number"
+              }
+            }
+          }
+        ],
+        "description": "Response of method setConnectContractorCreditLimit"
+      },
+      "AddConnectContractorCreditSettlementResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiResponseBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "credit_entry_id": {
+                "type": "integer"
+              },
+              "new_blocked_credit": {
+                "type": "number"
+              },
+              "new_available_credit": {
+                "type": "number"
+              }
+            }
+          }
+        ],
+        "description": "Response of method addConnectContractorCreditSettlement"
+      }
+    }
+  }
+}
