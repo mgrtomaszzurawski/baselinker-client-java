@@ -1,6 +1,6 @@
 package io.github.mgrtomaszzurawski.baselinker.client;
 
-public class BaselinkerException extends Exception {
+public class BaselinkerException extends RuntimeException {
 
     public BaselinkerException(String message) {
         super(message);
