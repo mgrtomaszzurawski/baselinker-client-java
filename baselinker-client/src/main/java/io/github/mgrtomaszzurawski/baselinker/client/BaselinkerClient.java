@@ -3,6 +3,9 @@ package io.github.mgrtomaszzurawski.baselinker.client;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import io.github.mgrtomaszzurawski.baselinker.client.json.BaselinkerJacksonModule;
+import io.github.mgrtomaszzurawski.baselinker.client.orders.OrdersService;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -22,8 +25,7 @@ public class BaselinkerClient {
     private static final String DEFAULT_API_URL = "https://api.baselinker.com/connector.php";
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
     private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofSeconds(30);
-    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = defaultObjectMapper();
     private static final HttpClient DEFAULT_HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(DEFAULT_CONNECT_TIMEOUT)
             .build();
@@ -34,19 +36,24 @@ public class BaselinkerClient {
     static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
     private static final String PARAM_METHOD = "method";
     private static final String PARAM_PARAMETERS = "parameters";
-    private static final String METHOD_GET_STATUS = "getStatus";
-    private static final String METHOD_GET_ERROR_CODE = "getErrorCode";
-    private static final String METHOD_GET_ERROR_MESSAGE = "getErrorMessage";
+    private static final String[] STATUS_ACCESSOR_NAMES = {"status", "getStatus"};
+    private static final String[] ERROR_CODE_ACCESSOR_NAMES = {"errorCode", "getErrorCode"};
+    private static final String[] ERROR_MESSAGE_ACCESSOR_NAMES = {"errorMessage", "getErrorMessage"};
 
     private final String apiToken;
     private final URI apiUrl;
     private final Duration requestTimeout;
     private final HttpTransport transport;
     private final ObjectMapper objectMapper;
+    private final OrdersService orders;
 
     @FunctionalInterface
     interface HttpTransport {
         String send(HttpRequest request) throws IOException, InterruptedException;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public BaselinkerClient(String apiToken) {
@@ -85,6 +92,14 @@ public class BaselinkerClient {
         this.transport = Objects.requireNonNull(transport, "transport must not be null");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
         this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout must not be null");
+        this.orders = new OrdersService(this);
+    }
+
+    /**
+     * Orders service — typed access to order-related BaseLinker methods.
+     */
+    public OrdersService orders() {
+        return orders;
     }
 
     public <T> T execute(String method, Map<String, Object> parameters, Class<T> responseType)
@@ -135,34 +150,31 @@ public class BaselinkerClient {
     }
 
     private <T> void checkForApiError(T response) throws BaselinkerApiException {
-        try {
-            Method getStatus = response.getClass().getMethod(METHOD_GET_STATUS);
-            Object status = getStatus.invoke(response);
-            if (status != null && STATUS_ERROR.equals(status.toString())) {
-                String errorCode = invokeStringGetter(response, METHOD_GET_ERROR_CODE);
-                String errorMessage = invokeStringGetter(response, METHOD_GET_ERROR_MESSAGE);
-                throw new BaselinkerApiException(errorCode, errorMessage);
-            }
-        } catch (BaselinkerApiException exception) {
-            throw exception;
-        } catch (NoSuchMethodException exception) {
-            // Model lacks getStatus() — skip error check, return as-is
-        } catch (InvocationTargetException | IllegalAccessException exception) {
-            // should never happen with generated models — fail fast
-            throw new IllegalStateException("Failed to check API error status", exception);
+        Object status = invokeFirstAvailable(response, STATUS_ACCESSOR_NAMES);
+        if (status == null || !STATUS_ERROR.equals(status.toString())) {
+            return;
         }
+        Object errorCode = invokeFirstAvailable(response, ERROR_CODE_ACCESSOR_NAMES);
+        Object errorMessage = invokeFirstAvailable(response, ERROR_MESSAGE_ACCESSOR_NAMES);
+        throw new BaselinkerApiException(
+                errorCode != null ? errorCode.toString() : null,
+                errorMessage != null ? errorMessage.toString() : null
+        );
     }
 
-    private static String invokeStringGetter(Object target, String methodName) {
-        try {
-            Method getter = target.getClass().getMethod(methodName);
-            Object value = getter.invoke(target);
-            return value != null ? value.toString() : null;
-        } catch (NoSuchMethodException exception) {
-            return null;
-        } catch (InvocationTargetException | IllegalAccessException exception) {
-            return null;
+    private static Object invokeFirstAvailable(Object target, String... methodNames) {
+        for (String methodName : methodNames) {
+            try {
+                Method getter = target.getClass().getMethod(methodName);
+                getter.setAccessible(true);
+                return getter.invoke(target);
+            } catch (NoSuchMethodException ignored) {
+                // try next candidate
+            } catch (InvocationTargetException | IllegalAccessException exception) {
+                throw new IllegalStateException("Failed to invoke " + methodName, exception);
+            }
         }
+        return null;
     }
 
     private static String urlEncode(String value) {
@@ -177,4 +189,54 @@ public class BaselinkerClient {
         return value;
     }
 
+    private static ObjectMapper defaultObjectMapper() {
+        return new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .registerModule(new BaselinkerJacksonModule());
+    }
+
+    /**
+     * Fluent builder for {@link BaselinkerClient}. Only {@code apiToken} is required.
+     */
+    public static final class Builder {
+        private String apiToken;
+        private URI apiUrl = URI.create(DEFAULT_API_URL);
+        private HttpClient httpClient = DEFAULT_HTTP_CLIENT;
+        private ObjectMapper objectMapper = DEFAULT_OBJECT_MAPPER;
+        private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
+
+        private Builder() {
+        }
+
+        public Builder apiToken(String apiToken) {
+            this.apiToken = apiToken;
+            return this;
+        }
+
+        public Builder apiUrl(URI apiUrl) {
+            this.apiUrl = Objects.requireNonNull(apiUrl, "apiUrl must not be null");
+            return this;
+        }
+
+        public Builder httpClient(HttpClient httpClient) {
+            this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
+            return this;
+        }
+
+        public Builder objectMapper(ObjectMapper objectMapper) {
+            this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
+            return this;
+        }
+
+        public Builder requestTimeout(Duration requestTimeout) {
+            this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout must not be null");
+            return this;
+        }
+
+        public BaselinkerClient build() {
+            return new BaselinkerClient(apiToken, apiUrl, httpClient, objectMapper, requestTimeout);
+        }
+    }
 }
