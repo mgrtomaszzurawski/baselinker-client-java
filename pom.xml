@@ -18,6 +18,7 @@
     <modules>
         <module>baselinker-client</module>
         <module>demo-app</module>
+        <module>examples</module>
     </modules>
 
 </project>
