@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.github.mgrtomaszzurawski.baselinker.client.inventory.InventoryService;
 import io.github.mgrtomaszzurawski.baselinker.client.json.BaselinkerJacksonModule;
 import io.github.mgrtomaszzurawski.baselinker.client.orders.OrdersService;
 
@@ -46,6 +47,7 @@ public class BaselinkerClient {
     private final HttpTransport transport;
     private final ObjectMapper objectMapper;
     private final OrdersService orders;
+    private final InventoryService inventory;
 
     @FunctionalInterface
     interface HttpTransport {
@@ -93,6 +95,7 @@ public class BaselinkerClient {
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
         this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout must not be null");
         this.orders = new OrdersService(this);
+        this.inventory = new InventoryService(this);
     }
 
     /**
@@ -100,6 +103,13 @@ public class BaselinkerClient {
      */
     public OrdersService orders() {
         return orders;
+    }
+
+    /**
+     * Inventory service — typed access to catalogs, warehouses, and products.
+     */
+    public InventoryService inventory() {
+        return inventory;
     }
 
     public <T> T execute(String method, Map<String, Object> parameters, Class<T> responseType)
