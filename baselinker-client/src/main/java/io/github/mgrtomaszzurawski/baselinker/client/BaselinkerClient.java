@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.github.mgrtomaszzurawski.baselinker.client.documents.InventoryDocumentsService;
 import io.github.mgrtomaszzurawski.baselinker.client.inventory.InventoryService;
 import io.github.mgrtomaszzurawski.baselinker.client.json.BaselinkerJacksonModule;
 import io.github.mgrtomaszzurawski.baselinker.client.orders.OrdersService;
@@ -48,6 +49,7 @@ public class BaselinkerClient {
     private final ObjectMapper objectMapper;
     private final OrdersService orders;
     private final InventoryService inventory;
+    private final InventoryDocumentsService inventoryDocuments;
 
     @FunctionalInterface
     interface HttpTransport {
@@ -96,6 +98,7 @@ public class BaselinkerClient {
         this.requestTimeout = Objects.requireNonNull(requestTimeout, "requestTimeout must not be null");
         this.orders = new OrdersService(this);
         this.inventory = new InventoryService(this);
+        this.inventoryDocuments = new InventoryDocumentsService(this);
     }
 
     /**
@@ -110,6 +113,14 @@ public class BaselinkerClient {
      */
     public InventoryService inventory() {
         return inventory;
+    }
+
+    /**
+     * Inventory documents service — typed access to the GRN (goods receipt) flow and
+     * related document operations.
+     */
+    public InventoryDocumentsService inventoryDocuments() {
+        return inventoryDocuments;
     }
 
     public <T> T execute(String method, Map<String, Object> parameters, Class<T> responseType)
